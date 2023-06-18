@@ -12,8 +12,21 @@ final String? uri = dotenv.env["USER_REG"];
 
 class UserAuth {
   loginWithEmailAndPassword(context, email, password) async {
-    Navigator.push(
-        context, CupertinoPageRoute(builder: (context) => HomePage()));
+    var uri = "https://reqres.in/api/login";
+    var response = await Dio().post(uri, data: {
+      "email": email,
+      "password": password,
+    });
+    if (response.statusCode == 200) {
+      Provider.of<User>(context, listen: false).setUser("Samarth");
+      Navigator.push(
+          context, CupertinoPageRoute(builder: (context) => HomePage()));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Error while sign in..."),
+        backgroundColor: CupertinoColors.destructiveRed,
+      ));
+    }
   }
 
   registerUser(userName, email, password) async {

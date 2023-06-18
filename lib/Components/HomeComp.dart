@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:photoapp/providers/Image.dart';
+import 'package:photoapp/providers/User.dart';
 import 'package:provider/provider.dart';
 
 class HomeComp extends StatefulWidget {
@@ -46,7 +47,7 @@ class _HomeCompState extends State<HomeComp> {
         elevation: 0.0,
         backgroundColor: Colors.transparent,
         title: Text(
-          "Keyur",
+          Provider.of<User>(context).user,
           style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 27),
         ),
         actions: [

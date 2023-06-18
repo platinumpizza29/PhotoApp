@@ -6,15 +6,12 @@ import 'package:photoapp/Pages/HomePage.dart';
 import 'package:photoapp/Pages/LoginPage.dart';
 
 class User with ChangeNotifier {
-  var user;
+  late String _user;
 
-  UserAuthentication() async {
-    if (user == null) {
-      notifyListeners();
-      return LoginPage();
-    } else {
-      notifyListeners();
-      return HomePage();
-    }
+  String get user => _user;
+
+  setUser(String user) {
+    _user = user;
+    notifyListeners();
   }
 }

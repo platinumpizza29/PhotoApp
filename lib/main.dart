@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:photoapp/Pages/LoginPage.dart';
 import 'package:photoapp/providers/Image.dart';
 import 'package:photoapp/providers/Theme.dart';
+import 'package:photoapp/providers/User.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -11,7 +12,8 @@ Future<void> main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => MyTheme()),
-      ChangeNotifierProvider(create: (_) => Images())
+      ChangeNotifierProvider(create: (_) => Images()),
+      ChangeNotifierProvider(create: (_) => User())
     ],
     child: MyApp(),
   ));

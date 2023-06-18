@@ -31,14 +31,13 @@ class _SettingsCompState extends State<SettingsComp> {
         children: [
           ListTile(
             trailing: Switch(
-                value: themeValue,
+                value: context.read<MyTheme>().themeValue,
                 onChanged: (value) {
-                  context.read<MyTheme>().changeTheme(themeValue == true
+                  context.read<MyTheme>().changeTheme(value == false
                       ? ThemeData.light(useMaterial3: true)
                       : ThemeData.dark(useMaterial3: true));
-                  setState(() {
-                    themeValue = !themeValue;
-                  });
+                  Provider.of<MyTheme>(context, listen: false)
+                      .setThemeValue(value);
                 }),
             title: Text(
               "Theme",

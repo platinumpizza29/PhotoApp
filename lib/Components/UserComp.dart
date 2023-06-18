@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:photoapp/providers/User.dart';
+import 'package:provider/provider.dart';
 
 class UserComp extends StatefulWidget {
   const UserComp({super.key});
@@ -58,7 +60,7 @@ class _UserCompState extends State<UserComp> {
                   height: 20,
                 ),
                 Text(
-                  "Keyur Bilgi",
+                  Provider.of<User>(context).user,
                   style: GoogleFonts.poppins(fontSize: 27),
                 ),
               ],
