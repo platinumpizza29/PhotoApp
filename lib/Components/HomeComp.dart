@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:photoapp/Pages/CommentsPage.dart';
 import 'package:photoapp/Pages/ImageDetails.dart';
 
 class HomeComp extends StatefulWidget {
@@ -19,6 +20,8 @@ class HomeComp extends StatefulWidget {
 
 class _HomeCompState extends State<HomeComp> {
   List<dynamic> allImages = [];
+  bool _isLiked = false;
+  var _progress;
 
   @override
   void initState() {
@@ -35,10 +38,11 @@ class _HomeCompState extends State<HomeComp> {
         backgroundColor: Colors.transparent,
         title: Text(
           // Provider.of<User>(context).user["userName"],
-          "keyur",
+          "Pictoscape",
           style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 27),
         ),
         actions: [
+          Text(_progress == null ? "" : "$_progress"),
           IconButton(onPressed: () {}, icon: Icon(LineIcons.bell)),
           IconButton(
               onPressed: () {
@@ -64,18 +68,48 @@ class _HomeCompState extends State<HomeComp> {
                                 )));
                   },
                   child: Container(
-                    margin: EdgeInsets.all(8),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: Image.network(
-                          allImages[index],
-                          fit: BoxFit.cover,
+                      margin: EdgeInsets.all(8),
+                      child: Card(
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: AspectRatio(
+                                aspectRatio: 1 / 1,
+                                child: Image.network(
+                                  allImages[index],
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _isLiked = !_isLiked;
+                                      });
+                                    },
+                                    icon: _isLiked == false
+                                        ? Icon(LineIcons.heart)
+                                        : Icon(
+                                            LineIcons.heartAlt,
+                                            color: CupertinoColors.systemRed,
+                                          )),
+                                IconButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                              builder: (context) =>
+                                                  CommentsPage()));
+                                    },
+                                    icon: Icon(CupertinoIcons.chat_bubble)),
+                              ],
+                            )
+                          ],
                         ),
-                      ),
-                    ),
-                  ),
+                      )),
                 );
               })),
     );
@@ -133,7 +167,15 @@ class _HomeCompState extends State<HomeComp> {
         "userId": userId,
         "imageFile": await MultipartFile.fromFile(img!.path, filename: img.name)
       });
-      var response = await Dio().post(uri!, data: formData);
+      var response =
+          await Dio().post(uri!, data: formData, onSendProgress: (sent, total) {
+        if (total != -1) {
+          double progress = sent / total;
+          setState(() {
+            _progress = progress;
+          });
+        }
+      });
       print(response);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: CupertinoColors.activeGreen,

@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:localstore/localstore.dart';
 import 'package:photoapp/Pages/HomePage.dart';
-import 'package:photoapp/providers/User.dart';
-import 'package:provider/provider.dart';
 
 final db = Localstore.instance;
 
@@ -19,7 +17,6 @@ class UserAuth {
       "password": password,
     });
     if (response.statusCode == 200) {
-      Provider.of<User>(context, listen: false).setUser(response.data);
       Navigator.push(
           context, CupertinoPageRoute(builder: (context) => HomePage()));
     } else {
@@ -45,8 +42,6 @@ class UserAuth {
         'UserName': userName,
         'Email': email,
       });
-      Provider.of<User>(context, listen: false).UserState(id);
-      Provider.of<User>(context, listen: false).setUser(response.data);
       return "Success";
     }
   }

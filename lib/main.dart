@@ -1,11 +1,13 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:photoapp/Components/HomeComp.dart';
+
 import 'package:photoapp/Pages/HomePage.dart';
-import 'package:photoapp/Pages/LoginPage.dart';
+
 import 'package:photoapp/providers/Image.dart';
 import 'package:photoapp/providers/Theme.dart';
-import 'package:photoapp/providers/User.dart';
+
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -15,7 +17,6 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => MyTheme()),
       ChangeNotifierProvider(create: (_) => Images()),
-      ChangeNotifierProvider(create: (_) => User())
     ],
     child: MyApp(),
   ));
@@ -31,6 +32,6 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: context.watch<MyTheme>().currentTheme,
-        home: context.watch<User>().id == null ? LoginPage() : HomePage());
+        home: HomePage());
   }
 }
