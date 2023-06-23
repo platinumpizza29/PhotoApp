@@ -14,6 +14,7 @@ class Images with ChangeNotifier {
     var uri = dotenv.env["GET_ALL_IMAGES"];
     var response = await Dio().get(uri!);
     notifyListeners();
-    return response.data;
+    print(response.data["url"]);
+    return response.data["url"];
   }
 }

@@ -96,7 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       minimumSize: Size(double.infinity, 40)),
                   onPressed: () async {
                     var status = await UserAuth().registerUser(
-                        _userName.text, _email.text, _password.text);
+                        context, _userName.text, _email.text, _password.text);
                     if (status == "Error") {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text("Error while registering"),

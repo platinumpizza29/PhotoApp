@@ -4,6 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:line_icons/line_icon.dart';
+import 'package:line_icons/line_icons.dart';
+import 'package:localstore/localstore.dart';
+import 'package:photoapp/Pages/ImageDetails.dart';
 import 'package:photoapp/providers/User.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +20,7 @@ class UserComp extends StatefulWidget {
 
 class _UserCompState extends State<UserComp> {
   var imageList = [];
+  final db = Localstore.instance;
 
   Future<void> getImages() async {
     var uri = dotenv.env["GET_USER_IMAGES"];
@@ -60,7 +65,8 @@ class _UserCompState extends State<UserComp> {
                   height: 20,
                 ),
                 Text(
-                  Provider.of<User>(context).user,
+                  // Provider.of<User>(context).user["userName"],
+                  "keyur",
                   style: GoogleFonts.poppins(fontSize: 27),
                 ),
               ],
@@ -77,12 +83,53 @@ class _UserCompState extends State<UserComp> {
               itemCount: imageList.length, // Number of items in the grid
               itemBuilder: (BuildContext context, int index) {
                 // Build the individual grid items
-                return Container(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.network(
-                      imageList[index],
-                      fit: BoxFit.cover,
+                return CupertinoContextMenu(
+                  actions: <Widget>[
+                    CupertinoContextMenuAction(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => ImageDetails(
+                                      image: imageList[index],
+                                      user: "Keyur",
+                                    )));
+                      },
+                      isDefaultAction: true,
+                      trailingIcon: LineIcons.image,
+                      child: const Text('View'),
+                    ),
+                    CupertinoContextMenuAction(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      trailingIcon: LineIcons.crop,
+                      child: const Text('Crop'),
+                    ),
+                    CupertinoContextMenuAction(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      trailingIcon: LineIcons.alternateCloudDownload,
+                      child: const Text('Download'),
+                    ),
+                    CupertinoContextMenuAction(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      isDestructiveAction: true,
+                      trailingIcon: LineIcons.trash,
+                      child: const Text('Delete'),
+                    ),
+                  ],
+                  child: Container(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.network(
+                        imageList[index],
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 );

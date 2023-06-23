@@ -5,12 +5,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive/hive.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:photoapp/providers/Image.dart';
-import 'package:photoapp/providers/User.dart';
-import 'package:provider/provider.dart';
+import 'package:photoapp/Pages/ImageDetails.dart';
 
 class HomeComp extends StatefulWidget {
   const HomeComp({super.key});
@@ -20,17 +18,7 @@ class HomeComp extends StatefulWidget {
 }
 
 class _HomeCompState extends State<HomeComp> {
-  var feed = [];
-  var mainFeed = [];
-
-  Future<void> getAllImages() async {
-    var uri = dotenv.env["GET_ALL_IMAGES"];
-    var response = await Dio().get(uri!);
-    setState(() {
-      feed = response.data;
-      mainFeed = feed.reversed.toList();
-    });
-  }
+  List<dynamic> allImages = [];
 
   @override
   void initState() {
@@ -40,14 +28,14 @@ class _HomeCompState extends State<HomeComp> {
 
   @override
   Widget build(BuildContext context) {
-    final imageProvider = Provider.of<Images>(context);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0.0,
         backgroundColor: Colors.transparent,
         title: Text(
-          Provider.of<User>(context).user,
+          // Provider.of<User>(context).user["userName"],
+          "keyur",
           style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 27),
         ),
         actions: [
@@ -60,32 +48,36 @@ class _HomeCompState extends State<HomeComp> {
         ],
       ),
       body: RefreshIndicator(
-          onRefresh: () => imageProvider.getAllImages(),
-          child: FutureBuilder(
-              future: imageProvider.getAllImages(),
-              builder: ((context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CupertinoActivityIndicator(),
-                  );
-                }
-                return ListView.builder(
-                    itemCount: snapshot.data?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        height: MediaQuery.of(context).size.height / 2,
-                        width: double.infinity,
-                        margin: EdgeInsets.all(8),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Image.network(
-                            mainFeed[index],
-                            fit: BoxFit.cover,
-                          ),
+          onRefresh: () => getAllImages(),
+          child: ListView.builder(
+              itemCount: allImages.length,
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                            builder: (context) => ImageDetails(
+                                  image: allImages[index],
+                                  // user: Provider.of<User>(context).user,
+                                  user: "Keyur",
+                                )));
+                  },
+                  child: Container(
+                    margin: EdgeInsets.all(8),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: Image.network(
+                          allImages[index],
+                          fit: BoxFit.cover,
                         ),
-                      );
-                    });
-              }))),
+                      ),
+                    ),
+                  ),
+                );
+              })),
     );
   }
 
@@ -131,15 +123,15 @@ class _HomeCompState extends State<HomeComp> {
 
   Future<void> handleImagePicker(ImageSource source) async {
     var imagePicker = ImagePicker();
-    final pickedFile = await imagePicker.pickImage(
-        source: source, imageQuality: 10, requestFullMetadata: true);
+    final pickedFile =
+        await imagePicker.pickImage(source: source, requestFullMetadata: true);
     if (pickedFile != null) {
+      var img = await _cropImage(imageFile: pickedFile);
       var userId = 105.toString();
       var uri = dotenv.env["SERVER_URI"];
       FormData formData = FormData.fromMap({
         "userId": userId,
-        "imageFile": await MultipartFile.fromFile(pickedFile.path,
-            filename: pickedFile.name)
+        "imageFile": await MultipartFile.fromFile(img!.path, filename: img.name)
       });
       var response = await Dio().post(uri!, data: formData);
       print(response);
@@ -158,17 +150,24 @@ class _HomeCompState extends State<HomeComp> {
     }
   }
 
+  Future<XFile?> _cropImage({required XFile imageFile}) async {
+    CroppedFile? croppedImage =
+        await ImageCropper().cropImage(sourcePath: imageFile.path);
+    if (croppedImage == null) return null;
+    return XFile(croppedImage.path);
+  }
+
   Future<void> handleImageCapture(ImageSource source) async {
     var imagePicker = ImagePicker();
     final pickedFile =
-        await imagePicker.pickImage(source: source, imageQuality: 10);
+        await imagePicker.pickImage(source: source, requestFullMetadata: true);
     if (pickedFile != null) {
+      var img = await _cropImage(imageFile: pickedFile);
       var userId = 105.toString();
       var uri = dotenv.env["SERVER_URI"];
       FormData formData = FormData.fromMap({
         "userId": userId,
-        "imageFile": await MultipartFile.fromFile(pickedFile.path,
-            filename: pickedFile.name)
+        "imageFile": await MultipartFile.fromFile(img!.path, filename: img.name)
       });
       var response = await Dio().post(uri!, data: formData);
       print(response);
@@ -185,5 +184,14 @@ class _HomeCompState extends State<HomeComp> {
         backgroundColor: CupertinoColors.destructiveRed,
       ));
     }
+  }
+
+  getAllImages() async {
+    var uri = dotenv.env["GET_ALL_IMAGES"];
+    Response response = await Dio().get(uri!);
+    List<dynamic> responseList = response.data;
+    setState(() {
+      allImages = responseList.reversed.toList();
+    });
   }
 }

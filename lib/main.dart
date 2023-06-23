@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:photoapp/Components/HomeComp.dart';
+import 'package:photoapp/Pages/HomePage.dart';
 import 'package:photoapp/Pages/LoginPage.dart';
 import 'package:photoapp/providers/Image.dart';
 import 'package:photoapp/providers/Theme.dart';
@@ -29,6 +31,6 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: context.watch<MyTheme>().currentTheme,
-        home: LoginPage());
+        home: context.watch<User>().id == null ? LoginPage() : HomePage());
   }
 }
